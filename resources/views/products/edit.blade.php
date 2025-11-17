@@ -22,30 +22,38 @@
 
         @include('layouts.messages')
 
-        <!-- Product Creation Form -->
-        <form action="{{ route('products.store') }}" method="POST">
+        <!-- Product Edit Form -->
+        <form action="{{ route('products.update', $product->id) }}" method="POST">
             @csrf
+            @method('PUT')
+
             <div class="mb-3 mt-3">
                 <label for="name" class="form-label">Product <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}" disabled>
+                <input type="text" class="form-control" name="name" id="name" value="{{ old('name', $product->name) }}" disabled>
                 <small class="form-text text-muted">Can't change product name. Any changes will affect existing orders.</small>
             </div>
 
             <div class="row mb-3">
-                <div class="col md-6">
+                <div class="col md-4">
                     <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="price" id="price" value="{{ old('price') ? number_format((float)old('price'), 2, ',', '.') : '' }}" required>
+                    <input type="text" class="form-control" name="price" id="price" value="{{ old('price', number_format($product->price, 2, ',', '.')) }}" required>
                     <small class="form-text text-muted">Input product sell price. <br>Ex.: 39,99</small>
                     <br>
                     <small class="form-text text-danger">Changes to this field WILL NOT affect existing orders.</small>
                 </div>
                 
-                <div class="col md-6">
+                <div class="col md-4">
                     <label for="cost" class="form-label">Cost <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="cost" id="cost" value="{{ old('cost') ? number_format((float)old('cost'), 2, ',', '.') : '' }}" required>
+                    <input type="text" class="form-control" name="cost" id="cost" value="{{ old('cost', number_format($product->cost, 2, ',', '.')) }}" required>
                     <small class="form-text text-muted">Input product base cost. <br>Ex.: 19,99</small>
                     <br>
                     <small class="form-text text-danger">Changes to this field WILL NOT affect existing orders.</small>
+                </div>
+
+                <div class="col md-4">
+                    <label for="stock" class="form-label">Initial Stock</label>
+                    <input type="number" class="form-control" name="stock" id="stock" value="{{ old('stock', $product->stock) }}" min="0" step="1">
+                    <small class="form-text text-muted">Input amount in stock. <br>Currently: {{ $product->stock }} units</small>
                 </div>
             </div>
 

@@ -28,6 +28,7 @@
                         <th>Price</th>
                         <th>Cost</th>
                         <th>Profit</th>
+                        <th>Stock</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -41,6 +42,15 @@
                         <td class="table-warning">
                             <!-- Profit Calculation (Price - Cost) -->
                             {{ number_format($product->price - $product->cost, 2, ',', '.') }}
+                        </td>
+                        <td>
+                            @if ($product->stock <= 0)
+                                <span class="badge bg-danger">{{ $product->stock }}</span>
+                            @elseif ($product->stock <= 10)
+                                <span class="badge bg-warning">{{ $product->stock }}</span>
+                            @else
+                                <span class="badge bg-success">{{ $product->stock }}</span>
+                            @endif
                         </td>
                         <td>
                             <a href="{{ route('products.show', $product->id) }}" class="btn btn-info">Details</a>

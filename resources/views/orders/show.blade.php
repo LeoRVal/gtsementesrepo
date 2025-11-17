@@ -162,17 +162,35 @@
                                     <option value="" disabled selected>Select a product</option>
 
                                     @foreach ($products->sortBy('name') as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }} - 
+                                    <option value="{{ $product->id }}"
+                                        data-stock="{{ $product->stock }}"
+                                        @if ($product->stock <= 0) disabled @endif>
+                                        {{ $product->name }} - 
                                         R$ {{ number_format($product->price, 2, ',', '.') }} - 
-                                         ({{ number_format($product->cost, 2, ',', '.') }})
+                                        ({{ number_format($product->cost, 2, ',', '.') }})
+
+                                        @if ($product->stock <= 0)
+                                        - OUT OF STOCK
+                                        @elseif ($product->stock <= 10)
+                                        - Stock: {{ $product->stock }} (LOW)
+                                        @else 
+                                        - Stock {{ $product->stock }}
+                                        @endif
                                     </option>
                                     @endforeach
                                 </select>
+
+                                <small class="form-text text-muted">
+                                    Products without stock cannot be added to the order.
+                                </small>
                             </div>
 
                             <div class="mb-3">
                                 <label for="quantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control" name="quantity" id="quantity" min="1" required>
+                                <input type="number" class="form-control" name="quantity" id="quantity" min="1" max="" required>
+                                <small class="form-text text-muted" id="stock-info">
+                                    Select a product to see available stock.
+                                </small>
                             </div>
                             <button type="submit" class="btn btn-primary">Add Product</button>
                         </form>
@@ -181,6 +199,31 @@
             </div>
         </div>
     </main>
+
+
+    <script>
+        // Update stock info when product is selected
+        document.getElementById('product_id').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const stock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+            const quantityInput = document.getElementById('quantity');
+            const stockInfo = document.getElementById('stock-info');
+
+            if (stock > 0) {
+                quantityInput.max = stock;
+                quantityInput.value = Math.min(parseInt(quantityInput.value) || 1, stock);
+
+                if (stock <= 10) {
+                    stockInfo.innerHTML = `<span class="text-warning"><strong>Available stock: ${stock} units (LOW)</strong></span>`;
+                } else {
+                    stockInfo.innerHTML = `<span class="text-success">Available stock: ${stock} units</span>`;
+                }
+            } else {
+                quantityInput.max = 0;
+                stockInfo.innerHTML = `<span class="text-danger"><strong>Product out of stock</strong></span>`;
+            }
+        });
+    </script>
     @endsection
 </body>
 </html>

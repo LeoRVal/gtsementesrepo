@@ -28,16 +28,31 @@
         </div>
 
         <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <strong>Sell Price:</strong>
                 <div>{{ number_format($product->price, 2, ',', '.') }}</div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <strong>Cost:</strong>
                 <div>{{ number_format($product->cost, 2, ',', '.') }}</div>
             </div>
+
+            <div class="col-md-4">
+                <strong>Stock:</strong>
+                <div>
+                    @if ($product->stock <= 0)
+                        <span class="badge bg-danger fs-6">{{ $product->stock }} units</span>
+                    @elseif ($product->stock <= 10)
+                        <span class="badge bg-warning fs-6">{{ $product->stock }} units</span>
+                    @else
+                        <span class="badge bg-success fs-6">{{ $product->stock }} units</span>
+                    @endif
+                </div>
+            </div>
         </div>
+
+        
 
         <div class="mt-3">
             <a href="{{ route('products.index') }}" class=" btn btn-secondary">Back</a>

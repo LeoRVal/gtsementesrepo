@@ -49,7 +49,7 @@ Route::get('orders/new', [OrderController::class, 'create'])->name('orders.creat
 Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 Route::post('orders/{order}/add-products', [OrderController::class, 'addProduct'])->name('orders.addProduct');
-Route::delete('orders/{order}/remove-product', [OrderController::class, 'removeProduct'])->name('orders.removeProduct');
+Route::delete('orders/{order}/remove-product/{product}', [OrderController::class, 'removeProduct'])->name('orders.removeProduct');
 Route::get('orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
 Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
 Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');

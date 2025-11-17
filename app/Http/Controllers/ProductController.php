@@ -23,15 +23,18 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|regex:/^\d+([.,]\d{1,2})?$/',
             'cost' => 'required|regex:/^\d+([.,]\d{1,2})?$/',
+            'stock' => 'nullable|integer|min:0'
         ]);
 
         $price = str_replace(',', '.', $request->input('price'));
         $cost = str_replace(',', '.', $request->input('cost'));
+        $stock = $request->input('stock', 0);
 
         Product::create([
             'name' => $request->input('name'),
             'price' => $price,
             'cost' => $cost,
+            'stock' => $stock
         ]);
 
         return redirect()->route('products.index')->with('success', 'Product created.');
@@ -45,6 +48,27 @@ class ProductController extends Controller
 
     public function edit(Product $product) {
         return view('products.edit', compact('product'));
+    }
+
+
+    public function update(Request $request, Product $product) {
+        $request->validate([
+            'price' => 'required|regex:/^\d+([.,]\d{1,2})?$/',
+            'cost' => 'required|regex:/^\d+([.,]\d{1,2})?$/',
+            'stock' => 'nullable|integer|min:0'
+        ]);
+
+        $price = str_replace(',', '.', $request->input('price'));
+        $cost = str_replace(',', '.', $request->input('cost'));
+        $stock = $request->input('stock', $product->stock);
+
+        $product->update([
+            'price' => $price,
+            'cost' => $cost,
+            'stock' => $stock
+        ]);
+
+        return redirect()->route('products.show', $product)->with('success', 'Product updated.');
     }
 
 

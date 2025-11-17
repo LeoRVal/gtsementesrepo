@@ -30,16 +30,22 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col md-6">
+                <div class="col md-4">
                     <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="price" id="price" value="{{ old('price') ? number_format((float)old('price'), 2, ',', '.') : '' }}" required>
                     <small class="form-text text-muted">Input product sell price. <br>Ex.: 39,99</small>
                 </div>
                 
-                <div class="col md-6">
+                <div class="col md-4">
                     <label for="cost" class="form-label">Cost <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="cost" id="cost" value="{{ old('cost') ? number_format((float)old('cost'), 2, ',', '.') : '' }}" required>
                     <small class="form-text text-muted">Input product base cost. <br>Ex.: 19,99</small>
+                </div>
+                
+                <div class="col md-4">
+                    <label for="stock" class="form-label">Initial Stock</label>
+                    <input type="number" class="form-control" name="stock" id="stock" value="{{ old('stock', 0) }}" min="0" step="1">
+                    <small class="form-text text-muted">Input initial stock amount. <br>Default: 0</small>
                 </div>
             </div>
 

@@ -101,7 +101,24 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $product = Product::findOrFail($request->product_id);
 
-        $this->updateOrderProduct($order, $product, $request->quantity);
+        // Check if chosen product is in stock
+        $quantityToAdd = $request->quantity;
+        $currentQuantityInOrder = 0;
+
+        if ($order->products()->where('product_id', $product->id)->exists()) {
+            $currentQuantityInOrder = $order->products()->where('product_id', $product->id)->first()->pivot->quantity;
+        }
+
+        $totalQuantityNeeded = $currentQuantityInOrder + $quantityToAdd;
+
+        if ($product->stock < $quantityToAdd) {
+            return redirect()->route('orders.show', $order->id)
+                ->with('error', "Not enough in stock for '{$product->name}'. Available stock: {$product->stock} units.");
+        }
+
+        $this->updateOrderProduct($order, $product, $quantityToAdd);
+
+        $product->decrement('stock', $quantityToAdd);
 
         return redirect()->route('orders.show', $order->id)->with('success', 'Product added to order.');
     }
@@ -136,7 +153,20 @@ class OrderController extends Controller
     // Remove products from order
     public function removeProduct($orderId, $productId) {
         $order = Order::findOrFail($orderId);
+        $product = Product::findOrFail($productId);
+
+        // Get quantity before removal
+        $quantityToReturn = 0;
+        if ($order->products()->where('product_id', $product->id)->exists()) {
+            $quantityToReturn = $order->products()->where('product_id', $product->id)->first()->pivot->quantity;
+        }
+
         $order->products()->detach($productId);
+
+        // Return stock
+        if ($quantityToReturn > 0) {
+            $product->increment('stock', $quantityToReturn);
+        }
 
         return redirect()->route('orders.show', $order->id)->with('success', 'Product removed from order.');
     }
@@ -161,6 +191,12 @@ class OrderController extends Controller
 
     // Delete order from storage
     public function destroy(Order $order) {
+        // Return product units to total stock before deleting order
+        foreach ($order->products as $product) {
+            $quantityToReturn = $product->pivot->quantity;
+            $product->increment('stock', $quantityToReturn);
+        }
+
         $order->delete();
 
         return redirect()->route('orders.index')->with('success', 'Order deleted.');
